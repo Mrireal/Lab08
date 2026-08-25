@@ -1,0 +1,49 @@
+-- Necesitamos --
+- Posicion de la mano
+- Posicion de los bloques
+- Estado de la garra 
+- Si un bloque esta tomado
+- Si un bloque esta libre o para tomar
+- Necesitamos la mano y los bloques
+- Necesitamos cubos sobre la mesa
+- Definir colores de cubos (solo colocar c1, c2 y c3, no es necesario definir colores)
+- Saber como estan ordenados los cubos
+- Saber cuantos cubos hay apilados
+
+¿¿ Definir posiciones abajo y arriba ¿¿
+
+-- Defincion de predicamentos --
+
+- Posicion de la mano: manito_at (manito, x, y)
+- Posicion de los bloques: bloque_at (bloque, x, y)
+- Estado de la garra: garra_estado (garra, estado)
+- Si un bloque esta tomado: bloque_tomado (bloque)
+- Si un bloque esta libre o para tomar: bloque_libre (bloque)
+- Saber como estan ordenados los cubos: orden_cubos (bloque1, bloque2)
+
+-- Definicio de acciones --
+
+- Accion: tomar_bloque (bloque)
+    Precondiciones: AND
+        - garra_estado (garra, abierta)
+        - bloque_libre (bloque)
+        - manito_at (manito, x, y)
+        - bloque_at (bloque, x, y)
+    Efectos: AND
+        - bloque_tomado (bloque)
+        - garra_estado (garra, cerrada)
+
+
+- Accion: soltar_bloque (bloque)
+    Precondiciones:
+        - bloque_tomado (bloque)
+    Efectos: AND
+        - bloque_libre (bloque)
+        - garra_estado (garra, abierta)
+
+- Accion: mover (manito, x, y)
+    Precondiciones:
+        - 
+    Efectos:
+        - manito_at (manito, x, y)
+
