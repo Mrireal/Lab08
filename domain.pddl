@@ -1,36 +1,36 @@
-(define (domain manito-blocks)
+(define (domain manito-bloques)
   (:requirements :strips :typing)
-  (:types block)
+  (:types bloque)
   
   (:predicates
-    (ontable ?b - block)
-    (on ?x ?y - block)
-    (clear ?b - block)
-    (holding ?b - block)
-    (handempty)
+    (sobre_mesa ?b - bloque)
+    (sobre ?x ?y - bloque)
+    (libre ?b - bloque)
+    (sosteniendo ?b - bloque)
+    (mano_vacia)
   )
   
-  (:action pickup
-    :parameters (?x - block)
-    :precondition (and (clear ?x) (ontable ?x) (handempty))
-    :effect (and (holding ?x) (not (handempty)) (not (ontable ?x)) (not (clear ?x)))
+  (:action tomar
+    :parameters (?x - bloque)
+    :precondition (and (libre ?x) (sobre_mesa ?x) (mano_vacia))
+    :effect (and (sosteniendo ?x) (not (mano_vacia)) (not (sobre_mesa ?x)) (not (libre ?x)))
   )
   
-  (:action putdown
-    :parameters (?x - block)
-    :precondition (holding ?x)
-    :effect (and (ontable ?x) (handempty) (not (holding ?x)) (clear ?x))
+  (:action soltar
+    :parameters (?x - bloque)
+    :precondition (sosteniendo ?x)
+    :effect (and (sobre_mesa ?x) (mano_vacia) (not (sosteniendo ?x)) (libre ?x))
   )
   
-  (:action stack
-    :parameters (?x ?y - block)
-    :precondition (and (holding ?x) (clear ?y))
-    :effect (and (on ?x ?y) (clear ?x) (not (holding ?x)) (handempty) (not (clear ?y)))
+  (:action apilar
+    :parameters (?x ?y - bloque)
+    :precondition (and (sosteniendo ?x) (libre ?y))
+    :effect (and (sobre ?x ?y) (libre ?x) (not (sosteniendo ?x)) (mano_vacia) (not (libre ?y)))
   )
   
-  (:action unstack
-    :parameters (?x ?y - block)
-    :precondition (and (on ?x ?y) (clear ?x) (handempty))
-    :effect (and (holding ?x) (clear ?y) (not (on ?x ?y)) (not (clear ?x)) (not (handempty)))
+  (:action desapilar
+    :parameters (?x ?y - bloque)
+    :precondition (and (sobre ?x ?y) (libre ?x) (mano_vacia))
+    :effect (and (sosteniendo ?x) (libre ?y) (not (sobre ?x ?y)) (not (libre ?x)) (not (mano_vacia)))
   )
 )

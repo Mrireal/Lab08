@@ -1,65 +1,65 @@
--- BLOCKS WORLD para Manito --
+-- MUNDO DE BLOQUES para Manito --
 Abstracción simple: sin coordenadas, sin cinemática, sin colisiones.
 
 -- Predicados --
 
-1. ontable(X)      # X está sobre la mesa
-2. on(X, Y)        # X está sobre Y (X encima, Y debajo)
-3. clear(X)        # X está libre (nada encima)
-4. holding(X)      # Garra sostiene X
-5. handempty       # Garra está vacía
+1. sobre_mesa(X)    # X está sobre la mesa
+2. sobre(X, Y)      # X está sobre Y (X encima, Y debajo)
+3. libre(X)         # X está libre (nada encima)
+4. sosteniendo(X)   # Garra sostiene X
+5. mano_vacia       # Garra está vacía
 
 -- Acciones (4) --
 
-1. pickup(X)
+1. tomar(X)
    Precondiciones:
-     - clear(X)
-     - ontable(X)
-     - handempty
+     - libre(X)
+     - sobre_mesa(X)
+     - mano_vacia
    Efectos:
-     - holding(X)
-     - ¬handempty
-     - ¬ontable(X)
-     - ¬clear(X)
+     - sosteniendo(X)
+     - ¬mano_vacia
+     - ¬sobre_mesa(X)
+     - ¬libre(X)
 
-2. putdown(X)
+2. soltar(X)
    Precondiciones:
-     - holding(X)
+     - sosteniendo(X)
    Efectos:
-     - ontable(X)
-     - handempty
-     - ¬holding(X)
-     - clear(X)
+     - sobre_mesa(X)
+     - mano_vacia
+     - ¬sosteniendo(X)
+     - libre(X)
 
-3. stack(X, Y)
+3. apilar(X, Y)
    Precondiciones:
-     - holding(X)
-     - clear(Y)
+     - sosteniendo(X)
+     - libre(Y)
    Efectos:
-     - on(X, Y)
-     - clear(X)
-     - ¬holding(X)
-     - handempty
-     - ¬clear(Y)
+     - sobre(X, Y)
+     - libre(X)
+     - mano_vacia
+     - ¬sosteniendo(X)
+     - ¬libre(Y)
 
-4. unstack(X, Y)
+4. desapilar(X, Y)
    Precondiciones:
-     - on(X, Y)
-     - clear(X)
-     - handempty
+     - sobre(X, Y)
+     - libre(X)
+     - mano_vacia
    Efectos:
-     - holding(X)
-     - clear(Y)
-     - ¬on(X, Y)
-     - ¬clear(X)
-     - ¬handempty
+     - sosteniendo(X)
+     - libre(Y)
+     - ¬sobre(X, Y)
+     - ¬libre(X)
+     - ¬mano_vacia
 
 -- Escena inicial (siempre igual) --
-- blue, red, green sobre la mesa y separados
-- Todos libres (clear)
-- Garra vacía (handempty)
+- azul, rojo, verde sobre la mesa y separados
+- Todos libres (sin nada encima)
+- Garra vacía (mano_vacia)
 
 -- Metas --
-Goal A: green → red → blue (arriba → abajo)
-Goal B: blue → red → green (orden invertido)
+Meta A: verde → rojo → azul (arriba → abajo)
+Meta B: azul → rojo → verde (orden invertido)
 
