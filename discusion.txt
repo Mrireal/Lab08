@@ -1,49 +1,65 @@
--- Necesitamos --
-- Posicion de la mano
-- Posicion de los bloques
-- Estado de la garra 
-- Si un bloque esta tomado
-- Si un bloque esta libre o para tomar
-- Necesitamos la mano y los bloques
-- Necesitamos cubos sobre la mesa
-- Definir colores de cubos (solo colocar c1, c2 y c3, no es necesario definir colores)
-- Saber como estan ordenados los cubos
-- Saber cuantos cubos hay apilados
+-- BLOCKS WORLD para Manito --
+Abstracción simple: sin coordenadas, sin cinemática, sin colisiones.
 
-¿¿ Definir posiciones abajo y arriba ¿¿
+-- Predicados --
 
--- Defincion de predicamentos --
+1. ontable(X)      # X está sobre la mesa
+2. on(X, Y)        # X está sobre Y (X encima, Y debajo)
+3. clear(X)        # X está libre (nada encima)
+4. holding(X)      # Garra sostiene X
+5. handempty       # Garra está vacía
 
-- Posicion de la mano: manito_at (manito, x, y)
-- Posicion de los bloques: bloque_at (bloque, x, y)
-- Estado de la garra: garra_estado (garra, estado)
-- Si un bloque esta tomado: bloque_tomado (bloque)
-- Si un bloque esta libre o para tomar: bloque_libre (bloque)
-- Saber como estan ordenados los cubos: orden_cubos (bloque1, bloque2)
+-- Acciones (4) --
 
--- Definicio de acciones --
+1. pickup(X)
+   Precondiciones:
+     - clear(X)
+     - ontable(X)
+     - handempty
+   Efectos:
+     - holding(X)
+     - ¬handempty
+     - ¬ontable(X)
+     - ¬clear(X)
 
-- Accion: tomar_bloque (bloque)
-    Precondiciones: AND
-        - garra_estado (garra, abierta)
-        - bloque_libre (bloque)
-        - manito_at (manito, x, y)
-        - bloque_at (bloque, x, y)
-    Efectos: AND
-        - bloque_tomado (bloque)
-        - garra_estado (garra, cerrada)
+2. putdown(X)
+   Precondiciones:
+     - holding(X)
+   Efectos:
+     - ontable(X)
+     - handempty
+     - ¬holding(X)
+     - clear(X)
 
+3. stack(X, Y)
+   Precondiciones:
+     - holding(X)
+     - clear(Y)
+   Efectos:
+     - on(X, Y)
+     - clear(X)
+     - ¬holding(X)
+     - handempty
+     - ¬clear(Y)
 
-- Accion: soltar_bloque (bloque)
-    Precondiciones:
-        - bloque_tomado (bloque)
-    Efectos: AND
-        - bloque_libre (bloque)
-        - garra_estado (garra, abierta)
+4. unstack(X, Y)
+   Precondiciones:
+     - on(X, Y)
+     - clear(X)
+     - handempty
+   Efectos:
+     - holding(X)
+     - clear(Y)
+     - ¬on(X, Y)
+     - ¬clear(X)
+     - ¬handempty
 
-- Accion: mover (manito, x, y)
-    Precondiciones:
-        - 
-    Efectos:
-        - manito_at (manito, x, y)
+-- Escena inicial (siempre igual) --
+- blue, red, green sobre la mesa y separados
+- Todos libres (clear)
+- Garra vacía (handempty)
+
+-- Metas --
+Goal A: green → red → blue (arriba → abajo)
+Goal B: blue → red → green (orden invertido)
 

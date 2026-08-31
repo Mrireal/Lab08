@@ -1,16 +1,8 @@
 [project]
-name = "strips"
+name = "manito-blocks"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-requires-python = ">=3.12"
+description = "PDDL planner para Manito - apilador de bloques"
+requires-python = ">=3.8"
 dependencies = [
     "pyperplan>=2.1",
 ]
-
-[project.scripts]
-strips = "strips:main"
-
-[build-system]
-requires = ["uv_build>=0.12.5,<0.13.0"]
-build-backend = "uv_build"
