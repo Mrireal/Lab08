@@ -1,3 +1,5 @@
+# Israel González - Matias Carcamo
+
 # Manito - Planificador de Bloques PDDL
 
 Planificador PDDL para resolver problemas de apilamiento de bloques usando Manito (robot manipulador).
@@ -5,6 +7,7 @@ Planificador PDDL para resolver problemas de apilamiento de bloques usando Manit
 ## Descripción
 
 Este proyecto implementa un dominio PDDL simple (Blocks World / Mundo de Bloques) que modela:
+
 - Una garra/pinza que sostiene a lo máximo un bloque
 - Bloques sobre la mesa o sobre otro bloque
 - Bloques libres (sin nada encima) o bloqueados
@@ -27,12 +30,14 @@ Este proyecto implementa un dominio PDDL simple (Blocks World / Mundo de Bloques
 ## Instalación
 
 ### Requisitos
+
 - Python 3.8+
 - uv (gestor de paquetes) - opcional
 
 ### Pasos
 
 #### Opción 1: Con entorno virtual manual
+
 ```bash
 # Crear entorno virtual
 python -m venv .venv
@@ -46,6 +51,7 @@ pip install pyperplan>=2.1
 ```
 
 #### Opción 2: Con uv
+
 ```bash
 uv sync
 ```
@@ -53,11 +59,13 @@ uv sync
 ## Uso
 
 ### Resolver Meta A (verde → rojo → azul)
+
 ```bash
 python solve.py goal-green-red-blue.pddl
 ```
 
 **Resultado esperado (4 acciones)**:
+
 1. Tomar rojo
 2. Apilar rojo sobre azul
 3. Tomar verde
@@ -66,11 +74,13 @@ python solve.py goal-green-red-blue.pddl
 **Torre final**: verde encima de rojo encima de azul
 
 ### Resolver Meta B (azul → rojo → verde)
+
 ```bash
 python solve.py goal-blue-red-green.pddl
 ```
 
 **Resultado esperado (4 acciones)**:
+
 1. Tomar rojo
 2. Apilar rojo sobre verde
 3. Tomar azul
@@ -82,17 +92,18 @@ python solve.py goal-blue-red-green.pddl
 
 ### Predicados
 
-| Predicado | Significado |
-|-----------|------------|
-| `sobre_mesa(X)` | X está sobre la mesa |
-| `sobre(X, Y)` | X está sobre Y (X encima, Y debajo) |
-| `libre(X)` | X está libre (nada encima) |
-| `sosteniendo(X)` | Garra sostiene X |
-| `mano_vacia` | Garra está vacía |
+| Predicado        | Significado                         |
+| ---------------- | ----------------------------------- |
+| `sobre_mesa(X)`  | X está sobre la mesa                |
+| `sobre(X, Y)`    | X está sobre Y (X encima, Y debajo) |
+| `libre(X)`       | X está libre (nada encima)          |
+| `sosteniendo(X)` | Garra sostiene X                    |
+| `mano_vacia`     | Garra está vacía                    |
 
 ### Acciones
 
 #### 1. **tomar(X)** - Tomar un bloque de la mesa
+
 ```pddl
 Precondiciones:
   - libre(X)
@@ -107,6 +118,7 @@ Efectos:
 ```
 
 #### 2. **soltar(X)** - Soltar un bloque en la mesa
+
 ```pddl
 Precondiciones:
   - sosteniendo(X)
@@ -119,6 +131,7 @@ Efectos:
 ```
 
 #### 3. **apilar(X, Y)** - Apilar X sobre Y
+
 ```pddl
 Precondiciones:
   - sosteniendo(X)
@@ -133,6 +146,7 @@ Efectos:
 ```
 
 #### 4. **desapilar(X, Y)** - Desapilar X de Y
+
 ```pddl
 Precondiciones:
   - sobre(X, Y)
@@ -164,12 +178,14 @@ azul    rojo    verde
 ## Planificador Utilizado
 
 Se utiliza **pyperplan** (versión 2.1+) con:
-- **Algoritmo de búsqueda**: A* (A-Star)
+
+- **Algoritmo de búsqueda**: A\* (A-Star)
 - **Heurística**: blind (sin heurística estimada)
 
 ## Planes Generados
 
 ### Plan Meta A (verde → rojo → azul)
+
 ```
 1. (tomar rojo)
 2. (apilar rojo azul)
@@ -178,6 +194,7 @@ Se utiliza **pyperplan** (versión 2.1+) con:
 ```
 
 **Torre resultante**:
+
 ```
   verde
   ─────
@@ -189,6 +206,7 @@ Se utiliza **pyperplan** (versión 2.1+) con:
 ```
 
 ### Plan Meta B (azul → rojo → verde)
+
 ```
 1. (tomar rojo)
 2. (apilar rojo verde)
@@ -197,6 +215,7 @@ Se utiliza **pyperplan** (versión 2.1+) con:
 ```
 
 **Torre resultante**:
+
 ```
   azul
   ─────
@@ -210,6 +229,7 @@ Se utiliza **pyperplan** (versión 2.1+) con:
 ## Archivos de Solución (.soln)
 
 Los archivos `.soln` contienen:
+
 - Número total de acciones
 - Lista detallada de cada acción con:
   - Precondiciones (PRE)
@@ -219,13 +239,16 @@ Los archivos `.soln` contienen:
 ## Detalles Técnicos
 
 ### Tipos PDDL
+
 - `bloque` - Tipo para los objetos (azul, rojo, verde)
 
 ### Requisitos
+
 - `:strips` - Acciones básicas sin estructura condicional
 - `:typing` - Soporte para tipos
 
 ### No se modela
+
 - Coordenadas ni posiciones exactas
 - Cinemática ni trayectorias del robot
 - Detección de colisiones
