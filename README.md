@@ -1,276 +1,111 @@
-# Israel González - Matias Carcamo
-
 # Manito - Planificador de Bloques PDDL
 
-Planificador PDDL para resolver problemas de apilamiento de bloques usando Manito (robot manipulador).
+## Instalacion
 
-## Descripción
+Ubicarse en la carpeta `Lab08` antes de ejecutar los comandos.
 
-Este proyecto implementa un dominio PDDL simple (Blocks World / Mundo de Bloques) que modela:
+### Opcion 1: con uv
 
-- Una garra/pinza que sostiene a lo máximo un bloque
-- Bloques sobre la mesa o sobre otro bloque
-- Bloques libres (sin nada encima) o bloqueados
-- Acciones simbólicas: tomar, soltar, apilar y desapilar
+Instalar `uv` si aun no esta instalado:
 
-## Estructura del Proyecto
-
-```
-.
-├── domain.pddl                    # Dominio PDDL con predicados y acciones
-├── goal-green-red-blue.pddl      # Meta A: torre verde → rojo → azul
-├── goal-blue-red-green.pddl      # Meta B: torre azul → rojo → verde
-├── goal-green-red-blue.pddl.soln # Solución Meta A
-├── goal-blue-red-green.pddl.soln # Solución Meta B
-├── solve.py                       # Script para ejecutar pyperplan
-├── pyproject.toml                 # Configuración del proyecto
-├── README.md                      # Este archivo
+```powershell
+pip install uv
 ```
 
-## Instalación
+Luego instalar las dependencias del proyecto:
 
-### Requisitos
-
-- Python 3.8+
-- uv (gestor de paquetes) - opcional
-
-### Pasos
-
-#### Opción 1: Con entorno virtual manual
-
-```bash
-# Crear entorno virtual
-python -m venv .venv
-
-# Activar entorno
-.venv\Scripts\activate  # En Windows
-source .venv/bin/activate  # En Linux/Mac
-
-# Instalar dependencia
-pip install pyperplan>=2.1
-```
-
-#### Opción 2: Con uv
-
-```bash
+```powershell
 uv sync
 ```
 
-## Uso
+### Opcion 2: con pip
 
-### Resolver Meta A (verde → rojo → azul)
+```powershell
+python -m pip install "pyperplan>=2.1"
+```
 
-```bash
+## Como resolver las metas
+
+El archivo `domain.pddl` contiene las reglas del mundo y cada archivo `goal-*.pddl` define una meta. Al ejecutar el script, se crea o actualiza automaticamente un archivo `.soln` con el plan encontrado.
+
+### Meta A: verde sobre rojo sobre azul
+
+```powershell
 python solve.py goal-green-red-blue.pddl
 ```
 
-**Resultado esperado (4 acciones)**:
+Plan esperado:
 
-1. Tomar rojo
-2. Apilar rojo sobre azul
-3. Tomar verde
-4. Apilar verde sobre rojo
+```text
+1. tomar rojo
+2. apilar rojo azul
+3. tomar verde
+4. apilar verde rojo
+```
 
-**Torre final**: verde encima de rojo encima de azul
+### Meta B: azul sobre rojo sobre verde
 
-### Resolver Meta B (azul → rojo → verde)
-
-```bash
+```powershell
 python solve.py goal-blue-red-green.pddl
 ```
 
-**Resultado esperado (4 acciones)**:
+Plan esperado:
 
-1. Tomar rojo
-2. Apilar rojo sobre verde
-3. Tomar azul
-4. Apilar azul sobre rojo
-
-**Torre final**: azul encima de rojo encima de verde
+```text
+1. tomar rojo
+2. apilar rojo verde
+3. tomar azul
+4. apilar azul rojo
+```
 
 ## Dominio PDDL
 
 ### Predicados
 
-| Predicado        | Significado                         |
-| ---------------- | ----------------------------------- |
-| `sobre_mesa(X)`  | X está sobre la mesa                |
-| `sobre(X, Y)`    | X está sobre Y (X encima, Y debajo) |
-| `libre(X)`       | X está libre (nada encima)          |
-| `sosteniendo(X)` | Garra sostiene X                    |
-| `mano_vacia`     | Garra está vacía                    |
+| Predicado | Significado |
+| --- | --- |
+| `sobre_mesa(X)` | X esta sobre la mesa |
+| `sobre(X, Y)` | X esta sobre Y |
+| `libre(X)` | No hay bloques encima de X |
+| `sosteniendo(X)` | La garra sostiene X |
+| `mano_vacia` | La garra esta vacia |
 
 ### Acciones
 
-#### 1. **tomar(X)** - Tomar un bloque de la mesa
+| Accion | Precondiciones | Efectos principales |
+| --- | --- | --- |
+| `tomar(X)` | X libre, sobre la mesa y mano vacia | La garra sostiene X |
+| `soltar(X)` | La garra sostiene X | X queda sobre la mesa y libre |
+| `apilar(X, Y)` | La garra sostiene X e Y esta libre | X queda sobre Y |
+| `desapilar(X, Y)` | X esta sobre Y, X libre y mano vacia | La garra sostiene X |
 
-```pddl
-Precondiciones:
-  - libre(X)
-  - sobre_mesa(X)
-  - mano_vacia
+## Escena inicial
 
-Efectos:
-  - sosteniendo(X)
-  - ¬mano_vacia
-  - ¬sobre_mesa(X)
-  - ¬libre(X)
-```
+- Tres bloques: azul, rojo y verde.
+- Todos comienzan separados sobre la mesa y libres.
+- La garra comienza con la mano vacia.
 
-#### 2. **soltar(X)** - Soltar un bloque en la mesa
-
-```pddl
-Precondiciones:
-  - sosteniendo(X)
-
-Efectos:
-  - sobre_mesa(X)
-  - mano_vacia
-  - ¬sosteniendo(X)
-  - libre(X)
-```
-
-#### 3. **apilar(X, Y)** - Apilar X sobre Y
-
-```pddl
-Precondiciones:
-  - sosteniendo(X)
-  - libre(Y)
-
-Efectos:
-  - sobre(X, Y)
-  - libre(X)
-  - mano_vacia
-  - ¬sosteniendo(X)
-  - ¬libre(Y)
-```
-
-#### 4. **desapilar(X, Y)** - Desapilar X de Y
-
-```pddl
-Precondiciones:
-  - sobre(X, Y)
-  - libre(X)
-  - mano_vacia
-
-Efectos:
-  - sosteniendo(X)
-  - libre(Y)
-  - ¬sobre(X, Y)
-  - ¬libre(X)
-  - ¬mano_vacia
-```
-
-## Escena Inicial (siempre igual)
-
-- **Tres bloques**: azul, rojo, verde
-- **Posición inicial**: todos sobre la mesa y separados
-- **Estado**: todos libres (sin nada encima)
-- **Garra**: vacía (mano_vacia)
-
-```
+```text
 azul    rojo    verde
- □       □       □
-━━━━━━━━━━━━━━━━━━━━━
+ []      []      []
+-------------------
         mesa
 ```
 
-## Planificador Utilizado
+## Como pensamos el problema
 
-Se utiliza **pyperplan** (versión 2.1+) con:
+Modelamos solo los cambios relevantes para construir una torre: que bloque esta sobre la mesa, sobre otro bloque, libre o sostenido por la garra. No modelamos el movimiento fisico de la garra, coordenadas, trayectorias, colisiones ni vision del robot. La accion `apilar`, por ejemplo, representa la manipulacion completa de dejar un bloque sobre otro.
 
-- **Algoritmo de búsqueda**: A\* (A-Star)
-- **Heurística**: blind (sin heurística estimada)
-
-## Planes Generados
-
-### Plan Meta A (verde → rojo → azul)
-
-```
-1. (tomar rojo)
-2. (apilar rojo azul)
-3. (tomar verde)
-4. (apilar verde rojo)
-```
-
-**Torre resultante**:
-
-```
-  verde
-  ─────
-  rojo
-  ─────
-  azul
-━━━━━━━━━
-   mesa
-```
-
-### Plan Meta B (azul → rojo → verde)
-
-```
-1. (tomar rojo)
-2. (apilar rojo verde)
-3. (tomar azul)
-4. (apilar azul rojo)
-```
-
-**Torre resultante**:
-
-```
-  azul
-  ─────
-  rojo
-  ─────
-  verde
-━━━━━━━━━
-   mesa
-```
-
-## Archivos de Solución (.soln)
-
-Los archivos `.soln` contienen:
-
-- Número total de acciones
-- Lista detallada de cada acción con:
-  - Precondiciones (PRE)
-  - Adiciones (ADD)
-  - Eliminaciones (DEL)
+Esta abstraccion permite que el planificador busque una secuencia valida de acciones sin necesitar simular un robot real.
 
 ## Detalles Técnicos
 
-### Tipos PDDL
+- `bloque` es el tipo de los objetos azul, rojo y verde.
+- `:strips` permite definir acciones con precondiciones y efectos.
+- `:typing` permite asignar tipos a objetos y parametros.
 
-- `bloque` - Tipo para los objetos (azul, rojo, verde)
+## Integrantes
 
-### Requisitos
-
-- `:strips` - Acciones básicas sin estructura condicional
-- `:typing` - Soporte para tipos
-
-### No se modela
-
-- Coordenadas ni posiciones exactas
-- Cinemática ni trayectorias del robot
-- Detección de colisiones
-- Sistema de visión del robot
-- Ejecución en robot físico
-
-## Ejecución y Validación
-
-Para validar que los planes son correctos:
-
-```bash
-# Resolver ambos problemas
-python solve.py goal-green-red-blue.pddl
-python solve.py goal-blue-red-green.pddl
-
-# Verificar que se crearon los archivos .soln
-ls *.soln
-```
-
-## Autor y Contexto
-
-**Proyecto para**: USS-ICIFH001 - Inteligencia Artificial  
-**Universidad**: Universidad San Sebastián  
-**Laboratorio**: 08 - PDDL para Manito  
-**Año**: 2026
+- Israel Gonzalez
+- Matias Carcamo
+- Docente: Cristhian Aguilera, asignatura de Inteligencia Artificial.
